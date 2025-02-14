@@ -9,6 +9,7 @@ import Card1 from '@/assets/cards/1.svg';
 import Card2 from '@/assets/cards/2.svg';
 import Card4 from '@/assets/cards/4.svg';
 import Card5 from '@/assets/cards/5.svg';
+
 import Card6 from '@/assets/cards/6.svg';
 import Card7 from '@/assets/cards/7.svg';
 import Card8 from '@/assets/cards/8.svg';
