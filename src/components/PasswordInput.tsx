@@ -7,7 +7,6 @@ interface PasswordInputProps {
   required?: boolean;
   value?: string;
   placeholder?: string;
-  disabled?: boolean;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 

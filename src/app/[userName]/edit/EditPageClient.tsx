@@ -370,8 +370,6 @@ export default function EditPageClient({ user, addLink, deleteLink, reorderLinks
     checkAuth();
   }, [user.userName, router]);
 
-  
-
   const handleReorder = async (fromIndex: number, toIndex: number) => {
     try {
       const token = localStorage.getItem('token');
@@ -507,7 +505,7 @@ export default function EditPageClient({ user, addLink, deleteLink, reorderLinks
               <iframe
                 key={previewKey}
                 src={`/${user.userName}`}
-                className="w-full h-[600px] bg-black pointer-events-none select-none"
+                className="w-full h-[600px] bg-black"
                 title="Profile Preview"
               />
             </div>
