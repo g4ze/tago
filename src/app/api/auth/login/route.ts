@@ -1,4 +1,3 @@
-// app/api/auth/login/route.ts
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
@@ -16,9 +15,11 @@ if (!process.env.JWT_SECRET) {
 
 export async function POST(req: Request) {
   try {
+    // Parse the request body
     const body = await req.json();
     const { identifier, password } = body;
 
+    // Validate required fields
     if (!identifier || !password) {
       return NextResponse.json(
         { message: 'All fields are required' },
@@ -26,6 +27,7 @@ export async function POST(req: Request) {
       );
     }
 
+    // Find user by username or email (case-insensitive search)
     const user = await prisma.user.findFirst({
       where: {
         OR: [
@@ -54,6 +56,7 @@ export async function POST(req: Request) {
       );
     }
 
+    // Verify password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return NextResponse.json(
@@ -62,28 +65,24 @@ export async function POST(req: Request) {
       );
     }
 
-    // Calculate expiration time (7 days)
-    const expiresIn = '7d';
-    const maxAge = 7 * 24 * 60 * 60; // 7 days in seconds
-
-    // Create token with uid (not userId)
+    // Create JWT token
     const token = jwt.sign(
       {
-        uid: user.uid,
+        userId: user.uid,
         userName: user.userName,
         email: user.email
       },
       jwtSecret,
-      { expiresIn }
+      { expiresIn: '7d' }
     );
 
-    // Remove password from user object
+    // Create a safe user object without password
     const safeUser = {
       ...user,
       password: undefined
     };
 
-    // Return response with token in both body and cookie
+    // In your login API route
     return NextResponse.json(
       {
         message: 'Login successful',
@@ -93,7 +92,7 @@ export async function POST(req: Request) {
       {
         status: 200,
         headers: {
-          'Set-Cookie': `token=${token}; Path=/; HttpOnly; Max-Age=${maxAge}; SameSite=Lax`
+          'Set-Cookie': `token=${token}; Path=/; HttpOnly; Max-Age=${7 * 24 * 60 * 60}; SameSite=Lax` // Changed SameSite to Lax
         }
       }
     );

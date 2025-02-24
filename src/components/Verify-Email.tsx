@@ -26,7 +26,6 @@ const VerifyEmail = () => {
   const token = searchParams.get('token');
   const email = searchParams.get('email');
   const [resendCooldown, setResendCooldown] = useState(0);
-  const url = process.env.NEXT_PUBLIC_URL;
 
   useEffect(() => {
     if (token) {
@@ -36,7 +35,7 @@ const VerifyEmail = () => {
 
         try {
           const response = await axios.post<VerifyResponse>(
-            `${url}/api/auth/verify-email`,
+            `mytago.tech/api/auth/verify-email`,
             { token }
           );
           setStatus('success');
@@ -69,7 +68,7 @@ const VerifyEmail = () => {
     setStatus('resending');
     try {
       await axios.post<VerifyResponse>(
-        `${url}/api/auth/resend-verification`,
+        `mytago.tech/api/auth/resend-verification`,
         { email }
       );
       setMessage('Verification email sent successfully! Please check your inbox.');

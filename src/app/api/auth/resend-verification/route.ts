@@ -9,7 +9,6 @@ dotenv.config();
 
 const prisma = new PrismaClient();
 const jwtSecret: string = process.env.JWT_SECRET as string;
-const url = process.env.NEXT_PUBLIC_URL;
 
 if (!process.env.JWT_SECRET) {
   throw new Error('Please add your JWT_SECRET to .env.local');
@@ -34,6 +33,7 @@ export async function POST(req: Request) {
       );
     }
 
+    // Find user by email
     const user = await prisma.user.findUnique({
       where: { 
         email: email.toLowerCase() 
@@ -61,6 +61,7 @@ export async function POST(req: Request) {
       );
     }
 
+    // Generate new verification token
     const verificationToken = jwt.sign(
       { 
         uid: user.uid,
@@ -71,8 +72,10 @@ export async function POST(req: Request) {
       { expiresIn: '24h' }
     );
 
-    const verificationUrl = `${url}/verify-email?token=${verificationToken}&email=${encodeURIComponent(email)}`;
+    // Create verification URL
+    const verificationUrl = `mytago.tech/verify-email?token=${verificationToken}&email=${encodeURIComponent(email)}`;
     
+    // Send verification email
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: email,

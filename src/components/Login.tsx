@@ -4,12 +4,6 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import BackgroundGrid from './BackgroundGrid';
 import PasswordInput from './PasswordInput';
-import { checkAuthStatus, saveAuthData } from '../utils/authUtils';
-
-interface FormData {
-  identifier: string;
-  password: string;
-}
 
 const LoadingSpinner = () => {
   return (
@@ -29,25 +23,27 @@ const Login = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
-  // Check if user is already logged in on component mount
   useEffect(() => {
-    const checkAuth = async () => {
+    const checkAuthStatus = async () => {
       try {
-        const { isAuthenticated, user } = await checkAuthStatus();
-        
-        // If already authenticated, redirect to user page
-        if (isAuthenticated && user) {
-          router.push(`/${user.userName}`);
+        const token = localStorage.getItem('token');
+        const user = localStorage.getItem('user');
+
+        if (token && user) {
+          const userData = JSON.parse(user);
+          router.push(`/${userData.userName}`);
           return;
         }
       } catch (err) {
         console.error('Auth check failed:', err);
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
       } finally {
         setIsInitialLoading(false);
       }
     };
 
-    checkAuth();
+    checkAuthStatus();
   }, [router]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -57,7 +53,7 @@ const Login = () => {
 
     try {
       const formData = new FormData(e.currentTarget);
-      const data = Object.fromEntries(formData) as unknown as FormData;
+      const data = Object.fromEntries(formData);
 
       const response = await fetch('/api/auth/login', {
         method: 'POST',
@@ -71,10 +67,9 @@ const Login = () => {
         throw new Error(result.message || 'Invalid credentials');
       }
 
-      // Save authentication data to localStorage
-      saveAuthData(result.token, result.user);
-      
-      // Redirect to edit page
+      localStorage.setItem('token', result.token);
+      localStorage.setItem('user', JSON.stringify(result.user));
+
       router.push(`/${result.user.userName}/edit`);
 
     } catch (err) {

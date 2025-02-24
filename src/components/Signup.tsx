@@ -56,13 +56,19 @@ const Signup = () => {
     e.preventDefault();
     setError("");
     setIsLoading(true);
-    const url = process.env.NEXT_PUBLIC_URL;
+
+    const formData = new FormData(e.currentTarget);
+    const username = formData.get('username') as string;
+
+    if (!validateUsername(username)) {
+      setIsLoading(false);
+      return;
+    }
 
     try {
-      const formData = new FormData(e.currentTarget);
       const data = {
         name: formData.get('name'),
-        username: formData.get('username'),
+        username: username,
         email: formData.get('email'),
         contact: formData.get('contact'),
         password: formData.get('password')
@@ -75,15 +81,14 @@ const Signup = () => {
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("user", JSON.stringify(response.data.user));
 
-      router.push(`${url}/verify-email?email=${encodeURIComponent(data.email as string)}`);
-        } catch (err: unknown) {
-          if (err instanceof Error) {
-            setError(err.message);
-          } else {
-            setError("Something went wrong. Please try again.");
-          }
-        }
-         finally {
+      router.push(`/${data.username}`);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Something went wrong. Please try again.");
+      }
+    } finally {
       setIsLoading(false);
     }
   };

@@ -14,7 +14,6 @@ const ResetPassword = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
-  const url = process.env.NEXT_PUBLIC_URL;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -29,7 +28,7 @@ const ResetPassword = () => {
     }
 
     try {
-      const response = await fetch(`${url}/api/auth/reset-password`, {
+      const response = await fetch('mytago.tech/api/auth/reset-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, password }),
